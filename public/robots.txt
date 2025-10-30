@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://nextjs-sxentra-website.vercel.app/
+
+# Sitemaps
+Sitemap: https://nextjs-sxentra-website.vercel.app/sitemap.xml
