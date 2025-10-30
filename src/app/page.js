@@ -69,7 +69,7 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
-        
+
       </section>
     </main>
   );

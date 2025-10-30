@@ -1,28 +1,68 @@
 @import "tailwindcss";
 @import '@fortawesome/fontawesome-free/css/all.min.css';
 
-html {
-  scroll-behavior: smooth;
-}
-
+html,
 body {
   font-family: "Montserrat", sans-serif;
   font-optical-sizing: auto;
+  font-size:14px;
+  scroll-behavior: smooth;
   
 }
 
 h1{
-    font-size:38px;
-    font-weight: normal;
+    font-size:32px;
+    font-weight:400;
+
 }
 h2{
-    font-size:32px;
-    font-weight: normal;
+    font-size:28px;
+    font-weight:400;
 }
 h3{
-    font-size:28px;
+    font-size:22px;
+    font-weight:400;
+   
+}h4{
+    font-size:18px;
+    font-weight:400;
    
 }
+h5{
+    font-size:16px;
+    font-weight:400;
+   
+}
+
 h1,h2,h3,h4,p{
     margin:10px 0px!important;
+}
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fadeInLeft {
+  animation: fadeInLeft 1s ease forwards;
+}
+
+.animate-fadeInRight {
+  animation: fadeInRight 1s ease forwards;
 }
