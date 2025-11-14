@@ -25,7 +25,7 @@ export default async function PostPage({ params }) {
   try {
     // ✅ Fetch post by slug
     const res = await fetch(
-      `https://sxentra.com/wp-json/wp/v2/posts?slug=${slug}&_embed`,
+      `https://www.williamjacket.com/blog/wp-json/wp/v2/posts?slug=${slug}&_embed`,
       { next: { revalidate: 60 } }
     );
 

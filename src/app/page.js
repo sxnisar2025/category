@@ -15,7 +15,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   // ✅ Fetch categories from WordPress
   const res = await fetch(
-    "https://sxentra.com/wp-json/wp/v2/categories?per_page=20",
+    "https://www.williamjacket.com/blog/wp-json/wp/v2/categories?per_page=20",
     { next: { revalidate: 60 } }
   );
 
