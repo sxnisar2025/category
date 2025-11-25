@@ -66,3 +66,12 @@ h1,h2,h3,h4,p{
 .animate-fadeInRight {
   animation: fadeInRight 1s ease forwards;
 }
+
+/* Hide horizontal scrollbar only */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
