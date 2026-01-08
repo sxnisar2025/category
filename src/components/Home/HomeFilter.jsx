@@ -26,6 +26,7 @@ export default function HomeFilter({ data = [] }) {
             src={getImage(featured)}
             alt={featured.title.rendered}
             className="w-full h-96 object-cover rounded"
+            
           />
 
           <div>
