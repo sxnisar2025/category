@@ -1,4 +1,4 @@
-import Hero from "@/components/Home/Hero";
+
 import HomeFilter from "@/components/Home/HomeFilter";
 
 export const revalidate = 60;
@@ -13,7 +13,7 @@ export default async function HomePage() {
     );
     if (categoryRes.ok) categories = await categoryRes.json();
   } catch (error) {
-    console.error("Category API error:", error);
+    console.error(error);
   }
 
   const categoryWithPosts = await Promise.all(
@@ -33,8 +33,8 @@ export default async function HomePage() {
 
   return (
     <main className="pt-20">
-      <Hero />
-      {/* 🔥 Pass data to client component */}
+     
+      {/* ✅ data IS PASSED HERE */}
       <HomeFilter data={categoryWithPosts} />
     </main>
   );

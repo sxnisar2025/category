@@ -62,7 +62,7 @@ export default function Header() {
 
           <Link href="/about-us" className="hover:text-blue-600 transition">About Us</Link>
           <Link href="/portfolio" className="hover:text-blue-600 transition">Portfolio</Link>
-          <Link href="/blog" className="hover:text-blue-600 transition">Blog</Link>
+          <Link href="/category" className="hover:text-blue-600 transition">Blog</Link>
           <Link href="/contact" className="hover:text-blue-600 transition">Contact</Link>
         </nav>
 

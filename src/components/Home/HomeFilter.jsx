@@ -1,222 +1,125 @@
 "use client";
-import { useState, useMemo } from "react";
+
 import Link from "next/link";
 
-export default function HomeFilter({ data }) {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+export default function HomeFilter({ data = [] }) {
+  // ✅ HARD GUARD (prevents crash forever)
+  if (!Array.isArray(data) || data.length === 0) {
+    return null;
+  }
 
-  // Filter valid categories (hide uncategorized & empty)
-  const validCategories = useMemo(
-    () =>
-      data.filter(
-        (cat) => cat.posts?.length > 0 && cat.slug !== "uncategorized"
-      ),
-    [data]
-  );
+  const allPosts = data.flatMap((cat) => cat.posts || []);
 
-  // Merge all posts for "All" view — remove duplicates and sort
-  const allPosts = useMemo(() => {
-    if (selectedCategory !== "all") return [];
+  const featured = allPosts[0];
+  const tinyPosts = allPosts.slice(1, 5);
 
-    const merged = validCategories.flatMap((cat) => cat.posts);
-
-    // remove duplicates by post.id
-    const uniqueMap = new Map();
-    merged.forEach((p) => uniqueMap.set(p.id, p));
-
-    const uniquePosts = Array.from(uniqueMap.values());
-
-    // sort by latest
-    uniquePosts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    return uniquePosts;
-  }, [validCategories, selectedCategory]);
+  const getImage = (post) =>
+    post?._embedded?.["wp:featuredmedia"]?.[0]?.source_url;
 
   return (
-    <div className="max-w-7xl mx-auto px-6 mb-10">
-      {/* CATEGORY BUTTONS */}
-      <div className="flex gap-3 mb-10 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible scrollbar-hide">
-        {/* ALL button */}
-        <button
-          onClick={() => setSelectedCategory("all")}
-          className={`whitespace-nowrap px-4 py-2 rounded-full border transition ${
-            selectedCategory === "all"
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-white text-gray-700"
-          }`}
-        >
-          All
-        </button>
+    <div className="max-w-5xl mx-auto px-4 mt-20">
 
-        {/* category buttons */}
-        {validCategories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setSelectedCategory(cat.slug)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full border transition ${
-              selectedCategory === cat.slug
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-700"
-            }`}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
+      {/* FEATURED */}
+      {featured && (
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <img
+            src={getImage(featured)}
+            alt={featured.title.rendered}
+            className="w-full h-96 object-cover rounded"
+          />
 
-      {/* ALL POSTS VIEW */}
-      {selectedCategory === "all" && allPosts.length > 0 && (
-        <>
-          {/* LATEST POSTS (ROW FORMAT) */}
-{/* LATEST POSTS (ROW FORMAT) */}
-<section className="py-12 border-b mb-10">
-  <h2 className="text-3xl font-bold mb-8">Latest Posts</h2>
-
-  <div className="flex flex-col gap-8">
-    {allPosts.slice(0, 16).map((post) => {
-      const category =
-        post._embedded?.["wp:term"]?.[0]?.[0] || { slug: "uncategorized", name: "Blog" };
-
-      return (
-        <div
-          key={`${post.id}-${post.slug}`}
-          className="flex flex-col md:flex-row gap-6 bg-white p-6 rounded-xl border shadow hover:shadow-lg transition"
-        >
-          {/* IMAGE */}
-          <Link href={`/${category.slug}/${post.slug}`} className="shrink-0">
-            <img
-              src={
-                post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-                "/placeholder.jpg"
-              }
-              className="w-full md:w-64 h-44 object-cover rounded-xl"
+          <div>
+            <h2
+              className="text-3xl font-bold mb-4"
+              dangerouslySetInnerHTML={{ __html: featured.title.rendered }}
             />
-          </Link>
-
-          {/* CONTENT */}
-          <div className="flex flex-col justify-between flex-1">
-
-            {/* CATEGORY NAME CLICKABLE */}
+            <div
+              className="text-gray-600 mb-6"
+              dangerouslySetInnerHTML={{ __html: featured.excerpt.rendered }}
+            />
             <Link
-              href={`/${category.slug}`}
-              className="text-sm text-blue-600 font-semibold mb-1 hover:underline w-fit"
+              href={`/${featured.slug}`}
+              className="bg-blue-600 text-white px-6 py-3 rounded inline-block"
             >
-              {category.name}
-            </Link>
-
-            {/* POST TITLE */}
-            <Link href={`/${category.slug}/${post.slug}`}>
-              <h3 className="text-xl font-bold hover:text-blue-600 mb-2">
-                {post.title.rendered.replace(/(<([^>]+)>)/gi, "")}
-              </h3>
-            </Link>
-
-            {/* SHORT DESCRIPTION */}
-            <p className="text-gray-700 mb-4 line-clamp-3">
-              {post.excerpt?.rendered
-                ?.replace(/(<([^>]+)>)/gi, "")
-                ?.slice(0, 150) || ""}
-              ...
-            </p>
-
-            {/* READ MORE BUTTON */}
-            <Link
-              href={`/${category.slug}/${post.slug}`}
-              className="inline-block w-fit px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              Read More →
+              Read More
             </Link>
           </div>
         </div>
-      );
-    })}
-  </div>
-</section>
-
-
-        </>
       )}
 
-      {/* SINGLE CATEGORY VIEW */}
-      {selectedCategory !== "all" &&
-        validCategories
-          .filter((cat) => cat.slug === selectedCategory)
-          .map((cat) => {
-            const posts = cat.posts;
+      {/* TINY POSTS */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16">
+        {tinyPosts.map((post) => (
+          <Link key={post.id} href={`/${post.slug}`}>
+            <img
+              src={getImage(post)}
+              alt=""
+              className="h-36 w-full object-cover rounded mb-2"
+            />
+            <h6
+              className="text-sm font-medium"
+              dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+            />
+          </Link>
+        ))}
+      </div>
 
-            const [bigPost, post2, post3, ...remaining] = posts;
-            return (
-              <section key={cat.id} className="py-12 border-b last:border-none">
-                <div className="flex justify-between items-center mb-8">
-                  <h2 className="text-3xl font-bold">{cat.name}</h2>
-                  <Link href={`/${cat.slug}`} className="text-blue-600 font-medium">
-                    View All →
-                  </Link>
-                </div>
+      {/* STORIES FOR YOU */}
+      <h2 className="text-2xl font-bold mb-6">
+  Stories for you
+</h2>
 
-                {/* Big + 2 small */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-                  <Link href={`/${cat.slug}/${bigPost.slug}`} className="group col-span-2">
-                    <img
-                      src={
-                        bigPost._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-                        "/placeholder.jpg"
-                      }
-                      className="w-full h-[380px] object-cover rounded-xl mb-5"
-                    />
-                    <h3 className="text-2xl font-bold group-hover:text-blue-600">
-                      {bigPost.title.rendered.replace(/(<([^>]+)>)/gi, "")}
-                    </h3>
-                  </Link>
+<div className="space-y-12">
+  {data.map((cat) => {
+    const post = cat.posts?.[0];
+    if (!post) return null;
 
-                  <div className="flex flex-col gap-8">
-                    {[post2, post3].map((post) => (
-                      <Link
-                        key={`${post.id}-${post.slug}`}
-                        href={`/${cat.slug}/${post.slug}`}
-                        className="group"
-                      >
-                        <img
-                          src={
-                            post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-                            "/placeholder.jpg"
-                          }
-                          className="w-full h-40 object-cover rounded-lg mb-3"
-                        />
-                        <h4 className="text-lg font-semibold group-hover:text-blue-600">
-                          {post.title.rendered.replace(/(<([^>]+)>)/gi, "")}
-                        </h4>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
+    return (
+      <div
+        key={cat.id}
+        className="grid grid-cols-1 md:grid-cols-4 gap-6 border-b pb-8"
+      >
+        {/* IMAGE */}
+        <img
+          src={getImage(post)}
+          alt={post.title.rendered}
+          className="w-full h-44 object-cover rounded"
+        />
 
-                {/* remaining grid */}
-                {remaining.length > 0 && (
-                  <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
-                    {remaining.slice(0, 5).map((post) => (
-                      <Link
-                        key={`${post.id}-${post.slug}`}
-                        href={`/${cat.slug}/${post.slug}`}
-                        className="bg-white p-4 rounded-xl border shadow hover:shadow-lg transition"
-                      >
-                        <img
-                          src={
-                            post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
-                            "/placeholder.jpg"
-                          }
-                          className="w-full h-32 object-cover rounded-md mb-3"
-                        />
-                        <h5 className="text-base font-medium line-clamp-2 hover:text-blue-600">
-                          {post.title.rendered.replace(/(<([^>]+)>)/gi, "")}
-                        </h5>
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </section>
-            );
-          })}
+        {/* CONTENT */}
+        <div className="md:col-span-3">
+          {/* CATEGORY */}
+          <span className="text-xs uppercase tracking-wide text-gray-500">
+            {cat.name}
+          </span>
+
+          {/* TITLE */}
+          <h3
+            className="text-xl font-semibold mt-1 mb-2"
+            dangerouslySetInnerHTML={{ __html: post.title.rendered }}
+          />
+
+          {/* DESCRIPTION */}
+          <div
+            className="text-gray-600 text-sm mb-4"
+            dangerouslySetInnerHTML={{
+              __html: post.excerpt.rendered,
+            }}
+          />
+
+          {/* CTA */}
+          <a
+            href={`/category/${cat.slug}`}
+            className="text-blue-600 font-medium"
+          >
+            Read More →
+          </a>
+        </div>
+      </div>
+    );
+  })}
+</div>
+
     </div>
   );
 }
