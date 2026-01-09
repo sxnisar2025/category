@@ -3,6 +3,7 @@ import HomeFilter from "@/components/Home/HomeFilter";
 
 export const revalidate = 60;
 
+
 export default async function HomePage() {
   let categories = [];
 

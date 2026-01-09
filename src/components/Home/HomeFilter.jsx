@@ -42,7 +42,7 @@ export default function HomeFilter({ data = [] }) {
               href={`/${featured.slug}`}
               className="bg-blue-600 text-white px-6 py-3 rounded inline-block"
             >
-              Read More
+              Read More...
             </Link>
           </div>
         </div>
